@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ES2020",
+    "moduleDetection": "force",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "outDir": "./dist",  // 输出目录
+    "skipLibCheck": true
+  },
+  "include": ["**/*.ts", ".config/*.d.ts"],
+  // "include": ["**/*.ts"],
+  // "exclude": [".config/*.js"]  // 排除自动生成的JS
+}
