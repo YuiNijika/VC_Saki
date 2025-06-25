@@ -4,7 +4,7 @@
 
 ## 快速开始
 
- 1.首先安装CLEO Redux、SlientPatch
+ 1.首先安装CLEO Redux、SlientPatch  
  2.将`Saki.ts`放到CLEO目录内
 
  ### 使用说明
