@@ -31,6 +31,8 @@ class Saki {
     private showMainWindow = false; // 控制主窗口显示状态
     private cursorVisible = false; // 控制鼠标光标显示
 
+    private gKonMeme = ImGui.LoadImage("CLEO/Saki_imgui/assets/yui.jpg");
+
     constructor() {
         log("===== Saki酱●█▀█▄Saki酱●█▀█▄Saki酱●█▀█▄ =====");
         this.player = new Player(0);
@@ -82,7 +84,7 @@ class Saki {
                 ImGui.Spacing();
 
                 // 添加标签页
-                const activeTab = ImGui.Tabs("MainTabs", "Status,Spawn,Settings");
+                const activeTab = ImGui.Tabs("MainTabs", "Status,Spawn,Settings,About");
 
                 if (activeTab === 0) { // Status
                     if (this.showFps) {
@@ -113,6 +115,8 @@ class Saki {
                 } else if (activeTab === 2) { // 设置
                     ImGui.Spacing();
                     this.showFps = ImGui.Checkbox("Show FPS", this.showFps);
+                } else if (activeTab === 3) { // 关于
+                    ImGui.ButtonImage("Image Button", this.gKonMeme, 320.0, 180.0);
                 }
 
                 ImGui.End();
