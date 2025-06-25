@@ -1,7 +1,7 @@
 /**
  * @author 鼠子(Tomoriゞ)
  * @version 1.0.1
- * @description 用于 Grand Theft Auto Vice City 的简单功能 CLEO 脚本，包含FPS显示功能。
+ * @description 基于 CLEO Redux 的简单功能脚本 for VC
  * @link https://github.com/ShuShuicu/VC_Saki
  * @license MIT
  */
