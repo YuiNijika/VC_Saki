@@ -1,7 +1,7 @@
 /**
  * @author 鼠子(Tomoriゞ)
- * @version 1.0.0
- * @description 用于 Grand Theft Auto Vice City 的简单功能 CLEO 脚本。
+ * @version 1.0.1
+ * @description 用于 Grand Theft Auto Vice City 的简单功能 CLEO 脚本，包含FPS显示功能。
  * @link https://github.com/ShuShuicu/VC_Saki
  * @license MIT
  */
@@ -17,10 +17,16 @@ class Saki {
 
     private player: Player;
     private isRunning: boolean;
+    private overlayWindowSize: [number, number] = [0, 0];
+    private readonly overlayOffset = 10.0;
+    private showFps = true;
+    private readonly showCoord = true; // 是否显示坐标
+    private gPlayerChar: Char;
 
     constructor() {
         log("===== Saki酱●█▀█▄Saki酱●█▀█▄Saki酱●█▀█▄ =====");
         this.player = new Player(0);
+        this.gPlayerChar = this.player.getChar(); // 现在player已初始化
         this.isRunning = true;
         this.init();
     }
@@ -29,10 +35,11 @@ class Saki {
         try {
             log("开始主循环监听");
             while (this.isRunning) {
-                wait(250);
-                
+                wait(0);  // 降低等待时间以获得更流畅的FPS显示
+
                 this.checkSaveKey();
                 this.checkVehicleSpawn();
+                this.renderOverlay();
             }
         } catch (e) {
             log("Saki酱严重错误: ", e);
@@ -42,13 +49,47 @@ class Saki {
         }
     }
 
+    private renderOverlay(): void {
+        ImGui.BeginFrame("SAKI_OVERLAY");
+
+        const pos = this.calcOverlayPosition();
+        ImGui.SetNextWindowPos(pos[0], pos[1], 1);
+        ImGui.SetNextWindowTransparency(0.5);
+
+        ImGui.Begin("Saki", true, false, true, false, true); // 窗口标题和属性
+        const size = ImGui.GetWindowSize("SakiOverlaySizeID");
+        this.overlayWindowSize = [size.width, size.height];
+
+        if (this.showFps) {
+            ImGui.Text(`FPS: ${Game.GetFramerate()}`);
+        }
+
+        if (this.showCoord) {
+            let coord = this.gPlayerChar.getCoordinates();
+            ImGui.Text(
+                `Coord: ${coord.x.toFixed(0)}, ${coord.y.toFixed(0)}, ${coord.z.toFixed(0)}`
+            );
+        }
+
+        ImGui.End();
+        ImGui.EndFrame();
+    }
+
+    private calcOverlayPosition(): [number, number] {
+        const displaySize = ImGui.GetDisplaySize();
+        return [
+            // 坐标offset值为左上角
+            this.overlayOffset,
+            this.overlayOffset
+        ];
+    }
+
     private exitScript(): void {
         log("正在退出Saki酱...");
         this.isRunning = false;
         exit("Saki酱已正常退出");
     }
 
-    // Save 功能相关方法
     private checkSaveKey(): void {
         if (Pad.IsKeyPressed(KeyCode.F4)) {
             log("检测到F4按键，激活保存菜单");
@@ -58,7 +99,6 @@ class Saki {
         }
     }
 
-    // VehicleSpawner 功能相关方法
     private checkVehicleSpawn(): void {
         if (!this.player.isPlaying()) {
             return;
@@ -148,10 +188,10 @@ class Saki {
     }
 
     private addVec(v1: { x: number; y: number; z: number }, v2: { x: number; y: number; z: number }): { x: number; y: number; z: number } {
-        const result = { 
-            x: v1.x + v2.x, 
-            y: v1.y + v2.y, 
-            z: v1.z + v2.z 
+        const result = {
+            x: v1.x + v2.x,
+            y: v1.y + v2.y,
+            z: v1.z + v2.z
         };
         log(`向量相加结果: x:${result.x.toFixed(2)}, y:${result.y.toFixed(2)}, z:${result.z.toFixed(2)}`);
         return result;
