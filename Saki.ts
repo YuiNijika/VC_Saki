@@ -95,7 +95,7 @@ class Saki {
                             `Position: ${coord.x.toFixed(0)}, ${coord.y.toFixed(0)}, ${coord.z.toFixed(0)}`
                         );
                     }
-                } else if (activeTab === 1) { // Features
+                } else if (activeTab === 1) { // 刷车
                     ImGui.Spacing();
                     if (ImGui.Button("Infernus", 120.0, 30.0)) {
                         this.spawnVehicle(
@@ -110,7 +110,7 @@ class Saki {
                             Saki.VEHICLES.RHINO.message
                         );
                     }
-                } else if (activeTab === 2) { // Settings
+                } else if (activeTab === 2) { // 设置
                     ImGui.Spacing();
                     this.showFps = ImGui.Checkbox("Show FPS", this.showFps);
                 }
