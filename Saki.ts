@@ -63,7 +63,7 @@ class Saki {
         // 根据主窗口状态设置鼠标光标可见性
         ImGui.SetCursorVisible(this.cursorVisible);
 
-        // F5 渲染主窗口
+        // F12 渲染主窗口
         if (this.showMainWindow) {
             ImGui.SetNextWindowSize(350.0, 600.0, 2); // 2 = ImGuiCond_Once
 
@@ -142,9 +142,9 @@ class Saki {
         ImGui.EndFrame();
     }
 
-    // 检查F5按键切换主窗口
+    // 检查F12按键切换主窗口
     private checkToggleWindow(): void {
-        if (Pad.IsKeyPressed(KeyCode.F5)) {
+        if (Pad.IsKeyPressed(KeyCode.F12)) {
             this.showMainWindow = !this.showMainWindow;
             this.cursorVisible = this.showMainWindow; // 主窗口显示时显示鼠标光标
             log(`Soyo状态切换为: ${this.showMainWindow}`);
@@ -166,8 +166,8 @@ class Saki {
     }
 
     private checkSaveKey(): void {
-        if (Pad.IsKeyPressed(KeyCode.F10)) {
-            log("检测到F10按键，激活保存菜单");
+        if (Pad.IsKeyPressed(KeyCode.F11)) {
+            log("检测到F11按键，激活保存菜单");
             Game.ActivateSaveMenu();
             log("保存菜单已激活");
             wait(1000);
