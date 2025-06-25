@@ -21,6 +21,8 @@ class Saki {
         }
     };
 
+    private gVersion = "1.1.0";
+
     private player: Player;
     private isRunning: boolean;
     private overlayWindowSize: [number, number] = [0, 0];
@@ -117,6 +119,10 @@ class Saki {
                     this.showFps = ImGui.Checkbox("Show FPS", this.showFps);
                 } else if (activeTab === 3) { // 关于
                     ImGui.ButtonImage("Image Button", this.gKonMeme, 320.0, 180.0);
+                    ImGui.Spacing();
+                    ImGui.Text("Saki by Tomori");
+                    ImGui.Text("Version: " + this.gVersion);
+                    ImGui.Text("GitHub: https://github.com/ShuShuicu/VC_Saki");
                 }
 
                 ImGui.End();
