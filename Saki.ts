@@ -11,8 +11,14 @@ import { KeyCode } from './.config/enums';
 
 class Saki {
     private static readonly VEHICLES = {
-        INFERNUS: { modelId: 141, message: "Saki酱: 刷出了一辆跑车!", key: KeyCode.F11 },
-        RHINO: { modelId: 162, message: "Saki酱: 刷出了一辆坦克!", key: KeyCode.F12 }
+        INFERNUS: { 
+            modelId: 141, 
+            message: "Saki酱: 刷出了一辆跑车!" 
+        },
+        RHINO: { 
+            modelId: 162, 
+            message: "Saki酱: 刷出了一辆坦克!" 
+        }
     };
 
     private player: Player;
