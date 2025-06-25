@@ -1,6 +1,6 @@
 /**
  * @author 鼠子(Tomoriゞ)
- * @version 1.0.1
+ * @version 1.1.0
  * @description 基于 CLEO Redux 的简单功能脚本 for VC
  * @link https://github.com/ShuShuicu/VC_Saki
  * @license MIT
@@ -11,8 +11,8 @@ import { KeyCode } from './.config/enums';
 
 class Saki {
     private static readonly VEHICLES = {
-        INFERNUS: { modelId: 141, message: "Saki酱: 刷出了一辆跑车!", key: KeyCode.F5 },
-        RHINO: { modelId: 162, message: "Saki酱: 刷出了一辆坦克!", key: KeyCode.F6 }
+        INFERNUS: { modelId: 141, message: "Saki酱: 刷出了一辆跑车!", key: KeyCode.F11 },
+        RHINO: { modelId: 162, message: "Saki酱: 刷出了一辆坦克!", key: KeyCode.F12 }
     };
 
     private player: Player;
@@ -22,11 +22,13 @@ class Saki {
     private showFps = true;
     private readonly showCoord = true; // 是否显示坐标
     private gPlayerChar: Char;
+    private showMainWindow = false; // 控制主窗口显示状态
+    private cursorVisible = false; // 控制鼠标光标显示
 
     constructor() {
         log("===== Saki酱●█▀█▄Saki酱●█▀█▄Saki酱●█▀█▄ =====");
         this.player = new Player(0);
-        this.gPlayerChar = this.player.getChar(); // 现在player已初始化
+        this.gPlayerChar = this.player.getChar();
         this.isRunning = true;
         this.init();
     }
@@ -35,10 +37,10 @@ class Saki {
         try {
             log("开始主循环监听");
             while (this.isRunning) {
-                wait(0);  // 降低等待时间以获得更流畅的FPS显示
+                wait(0);
 
                 this.checkSaveKey();
-                this.checkVehicleSpawn();
+                this.checkToggleWindow();
                 this.renderOverlay();
             }
         } catch (e) {
@@ -52,11 +54,70 @@ class Saki {
     private renderOverlay(): void {
         ImGui.BeginFrame("SAKI_OVERLAY");
 
+        // 根据主窗口状态设置鼠标光标可见性
+        ImGui.SetCursorVisible(this.cursorVisible);
+
+        // F5 渲染主窗口
+        if (this.showMainWindow) {
+            ImGui.SetNextWindowSize(350.0, 600.0, 2); // 2 = ImGuiCond_Once
+
+            // 使用临时变量捕获窗口是否仍然可见
+            const windowVisible = ImGui.Begin("Soyo Love~", this.showMainWindow, false, false, false, false);
+
+            // 如果窗口原本是显示状态但现在不可见了，说明用户点击了关闭按钮
+            if (this.showMainWindow && !windowVisible) {
+                this.showMainWindow = false;
+                this.cursorVisible = false;
+            } else {
+                this.showMainWindow = windowVisible;
+            }
+
+            if (this.showMainWindow) {
+                ImGui.Spacing();
+
+                // 添加标签页
+                const activeTab = ImGui.Tabs("MainTabs", "Status,Spawn,Settings");
+
+                if (activeTab === 0) { // Status
+                    if (this.showFps) {
+                        ImGui.Text(`FPS: ${Game.GetFramerate()}`);
+                    }
+
+                    if (this.showCoord) {
+                        let coord = this.gPlayerChar.getCoordinates();
+                        ImGui.Text(
+                            `Position: ${coord.x.toFixed(0)}, ${coord.y.toFixed(0)}, ${coord.z.toFixed(0)}`
+                        );
+                    }
+                } else if (activeTab === 1) { // Features
+                    ImGui.Spacing();
+                    if (ImGui.Button("Infernus", 120.0, 30.0)) {
+                        this.spawnVehicle(
+                            Saki.VEHICLES.INFERNUS.modelId,
+                            Saki.VEHICLES.INFERNUS.message
+                        );
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("Rhino", 120.0, 30.0)) {
+                        this.spawnVehicle(
+                            Saki.VEHICLES.RHINO.modelId,
+                            Saki.VEHICLES.RHINO.message
+                        );
+                    }
+                } else if (activeTab === 2) { // Settings
+                    ImGui.Spacing();
+                    this.showFps = ImGui.Checkbox("Show FPS", this.showFps);
+                }
+
+                ImGui.End();
+            }
+        }
+
         const pos = this.calcOverlayPosition();
         ImGui.SetNextWindowPos(pos[0], pos[1], 1);
         ImGui.SetNextWindowTransparency(0.5);
 
-        ImGui.Begin("Saki", true, false, true, false, true); // 窗口标题和属性
+        ImGui.Begin("Saki", true, true, true, true, true);
         const size = ImGui.GetWindowSize("SakiOverlaySizeID");
         this.overlayWindowSize = [size.width, size.height];
 
@@ -67,7 +128,7 @@ class Saki {
         if (this.showCoord) {
             let coord = this.gPlayerChar.getCoordinates();
             ImGui.Text(
-                `Coord: ${coord.x.toFixed(0)}, ${coord.y.toFixed(0)}, ${coord.z.toFixed(0)}`
+                `Position: ${coord.x.toFixed(0)}, ${coord.y.toFixed(0)}, ${coord.z.toFixed(0)}`
             );
         }
 
@@ -75,10 +136,18 @@ class Saki {
         ImGui.EndFrame();
     }
 
+    // 检查F5按键切换主窗口
+    private checkToggleWindow(): void {
+        if (Pad.IsKeyPressed(KeyCode.F5)) {
+            this.showMainWindow = !this.showMainWindow;
+            this.cursorVisible = this.showMainWindow; // 主窗口显示时显示鼠标光标
+            log(`Soyo状态切换为: ${this.showMainWindow}`);
+        }
+    }
+
     private calcOverlayPosition(): [number, number] {
         const displaySize = ImGui.GetDisplaySize();
         return [
-            // 坐标offset值为左上角
             this.overlayOffset,
             this.overlayOffset
         ];
@@ -91,39 +160,11 @@ class Saki {
     }
 
     private checkSaveKey(): void {
-        if (Pad.IsKeyPressed(KeyCode.F4)) {
-            log("检测到F4按键，激活保存菜单");
+        if (Pad.IsKeyPressed(KeyCode.F10)) {
+            log("检测到F10按键，激活保存菜单");
             Game.ActivateSaveMenu();
             log("保存菜单已激活");
             wait(1000);
-        }
-    }
-
-    private checkVehicleSpawn(): void {
-        if (!this.player.isPlaying()) {
-            return;
-        }
-
-        if (Pad.IsKeyPressed(KeyCode.F4)) {
-            log("检测到F4按键，准备退出脚本");
-            this.exitScript();
-            return;
-        }
-
-        if (Pad.IsKeyPressed(Saki.VEHICLES.INFERNUS.key)) {
-            log("检测到F5按键，准备生成跑车");
-            this.spawnVehicle(
-                Saki.VEHICLES.INFERNUS.modelId,
-                Saki.VEHICLES.INFERNUS.message
-            );
-        }
-
-        if (Pad.IsKeyPressed(Saki.VEHICLES.RHINO.key)) {
-            log("检测到F6按键，准备生成坦克");
-            this.spawnVehicle(
-                Saki.VEHICLES.RHINO.modelId,
-                Saki.VEHICLES.RHINO.message
-            );
         }
     }
 
