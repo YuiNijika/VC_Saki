@@ -1,3 +1,11 @@
+/**
+ * @author 鼠子(Tomoriゞ)
+ * @version 1.0.0
+ * @description 用于 Grand Theft Auto Vice City 的简单功能 CLEO 脚本。
+ * @link https://github.com/ShuShuicu/VC_Saki
+ * @license MIT
+ */
+
 /// <reference path="./.config/vc.d.ts" />
 import { KeyCode } from './.config/enums';
 
