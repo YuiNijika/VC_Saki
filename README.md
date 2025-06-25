@@ -4,8 +4,8 @@
 
 ## 快速开始
 
- 1.首先安装CLEO Redux、SlientPatch  
- 2.将`Saki.ts`放到CLEO目录内
+ 1.首先安装CLEO Redux  
+ 2.将`CLEO`文件夹中的内容复制到游戏目录下的`CLEO`文件夹中  
 
  ### 使用说明
   - `F11`随地存档
