@@ -1,16 +1,12 @@
-const ImgPath = "CLEO/Saki_imgui/assets/";
+const ImgPath = "CLEO/Saki_imgui/assets/vehicles/";
 
 export const VEHICLES = {
     Infernus: { 
         modelId: 141, 
-        img: ImgPath + "Infernus.png",
-        message: "Saki酱: 刷出了一辆跑车!" 
+        img: ImgPath + "infernus.jpg"
     },
     Rhino: { 
         modelId: 162, 
-        img: ImgPath + "Rhino.png",
-        message: "Saki酱: 刷出了一辆坦克!" 
+        img: ImgPath + "rhino.jpg"
     }
 } as const;
-
-export type VehicleType = keyof typeof VEHICLES;
