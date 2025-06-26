@@ -8,7 +8,7 @@
 
 /// <reference path="../.config/vc.d.ts" />
 import { KeyCode } from '../.config/enums';
-import { SakiImgUI } from './Saki_imgui';
+import { SakiImgUI } from './includes/Saki_imgui';
 
 class Saki {
 
