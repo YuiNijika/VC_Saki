@@ -5,7 +5,7 @@ export class SakiImgUI {
         Tommy: ImGui.LoadImage("CLEO/Saki_imgui/assets/Tommy.jpg"),
     };
 
-    private gVersion = "1.1.0";
+    private gVersion = "1.1.0 Dev";
     private showFps: boolean;
     private showCoord: boolean;
     private showMainWindow = false;
@@ -83,21 +83,24 @@ export class SakiImgUI {
         }
     }
 
+    // 在类中加载车辆图片
+    private readonly vehicleImages = {
+        Infernus: ImGui.LoadImage(VEHICLES.Infernus.img),
+        Rhino: ImGui.LoadImage(VEHICLES.Rhino.img)
+    };
+
     private renderSpawnTab(): void {
         ImGui.Spacing();
-        if (ImGui.Button("Infernus", 120.0, 30.0)) {
-            this.spawnVehicle(
-                VEHICLES.Infernus.modelId,
-                VEHICLES.Infernus.message
-            );
-        }
-        ImGui.SameLine();
-        if (ImGui.Button("Rhino", 120.0, 30.0)) {
-            this.spawnVehicle(
-                VEHICLES.Rhino.modelId,
-                VEHICLES.Rhino.message
-            );
-        }
+
+        (Object.keys(VEHICLES) as (keyof typeof VEHICLES)[]).forEach((vehicle, index) => {
+            if (index > 0) ImGui.SameLine();
+            if (ImGui.ButtonImage(vehicle, this.vehicleImages[vehicle], 120, 60)) {
+                this.spawnVehicle(
+                    VEHICLES[vehicle].modelId,
+                    `Saki酱: 刷出了一辆${vehicle}!` // 统一消息模板
+                );
+            }
+        });
     }
 
     private renderAboutTab(): void {
