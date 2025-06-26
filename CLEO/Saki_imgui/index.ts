@@ -8,17 +8,12 @@
 
 /// <reference path="../.config/vc.d.ts" />
 import { KeyCode } from '../.config/enums';
+import { VEHICLES } from './Saki_vehicles'; 
 
 class Saki {
-    private static readonly VEHICLES = {
-        INFERNUS: { 
-            modelId: 141, 
-            message: "Saki酱: 刷出了一辆跑车!" 
-        },
-        RHINO: { 
-            modelId: 162, 
-            message: "Saki酱: 刷出了一辆坦克!" 
-        }
+
+    private readonly gIMG = {
+        konMeme: ImGui.LoadImage("CLEO/Saki_imgui/assets/yui.jpg"),
     };
 
     private gVersion = "1.1.0";
@@ -32,8 +27,6 @@ class Saki {
     private gPlayerChar: Char;
     private showMainWindow = false; // 控制主窗口显示状态
     private cursorVisible = false; // 控制鼠标光标显示
-
-    private gKonMeme = ImGui.LoadImage("CLEO/Saki_imgui/assets/yui.jpg");
 
     constructor() {
         log("===== Saki酱●█▀█▄Saki酱●█▀█▄Saki酱●█▀█▄ =====");
@@ -103,22 +96,22 @@ class Saki {
                     ImGui.Spacing();
                     if (ImGui.Button("Infernus", 120.0, 30.0)) {
                         this.spawnVehicle(
-                            Saki.VEHICLES.INFERNUS.modelId,
-                            Saki.VEHICLES.INFERNUS.message
+                            VEHICLES.Infernus.modelId,
+                            VEHICLES.Infernus.message
                         );
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("Rhino", 120.0, 30.0)) {
                         this.spawnVehicle(
-                            Saki.VEHICLES.RHINO.modelId,
-                            Saki.VEHICLES.RHINO.message
+                            VEHICLES.Rhino.modelId,
+                            VEHICLES.Rhino.message
                         );
                     }
                 } else if (activeTab === 2) { // 设置
                     ImGui.Spacing();
                     this.showFps = ImGui.Checkbox("Show FPS", this.showFps);
                 } else if (activeTab === 3) { // 关于
-                    ImGui.ButtonImage("Image Button", this.gKonMeme, 320.0, 180.0);
+                    ImGui.ButtonImage("Image Button", this.gIMG.konMeme, 320.0, 180.0);
                     ImGui.Spacing();
                     ImGui.Text("Saki by Tomori");
                     ImGui.Text("Version: " + this.gVersion);
@@ -180,7 +173,7 @@ class Saki {
             log("检测到F11按键，激活保存菜单");
             Game.ActivateSaveMenu();
             log("保存菜单已激活");
-            wait(1000);
+            wait(0);
         }
     }
 
