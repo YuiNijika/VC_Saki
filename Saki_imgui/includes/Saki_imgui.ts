@@ -2,17 +2,17 @@ import { VEHICLES } from './Saki_vehicles';
 
 export class SakiImgUI {
     private readonly gIMG = {
-        konMeme: ImGui.LoadImage("CLEO/Saki_imgui/assets/yui.jpg"),
+        Tommy: ImGui.LoadImage("CLEO/Saki_imgui/assets/Tommy.jpg"),
     };
 
     private gVersion = "1.1.0";
     private showFps: boolean;
-    private readonly showCoord: boolean;
+    private showCoord: boolean;
     private showMainWindow = false;
     private cursorVisible = false;
 
     constructor(
-        showFps: boolean, 
+        showFps: boolean,
         showCoord: boolean,
         private spawnVehicle: (modelId: number, message: string) => void
     ) {
@@ -36,7 +36,7 @@ export class SakiImgUI {
         ImGui.SetNextWindowSize(350.0, 600.0, 2); // 2 = ImGuiCond_Once
 
         const windowVisible = ImGui.Begin("Soyo Love~", this.showMainWindow, false, false, false, false);
-        
+
         if (this.showMainWindow && !windowVisible) {
             this.showMainWindow = false;
             this.cursorVisible = false;
@@ -56,7 +56,10 @@ export class SakiImgUI {
                     this.renderSpawnTab();
                     break;
                 case 2: // Settings
+                    ImGui.Spacing();
                     this.showFps = ImGui.Checkbox("Show FPS", this.showFps);
+                    ImGui.SameLine();
+                    this.showCoord = ImGui.Checkbox("Show Coordinates", this.showCoord);
                     break;
                 case 3: // About
                     this.renderAboutTab();
@@ -98,9 +101,11 @@ export class SakiImgUI {
     }
 
     private renderAboutTab(): void {
-        ImGui.ButtonImage("Image Button", this.gIMG.konMeme, 320.0, 180.0);
+        ImGui.ButtonImage("Image Button", this.gIMG.Tommy, 320.0, 180.0);
         ImGui.Spacing();
         ImGui.Text("Saki by Tomori");
+        ImGui.Text("GTAMOD: www.gtamodx.com");
+        ImGui.Spacing();
         ImGui.Text("Version: " + this.gVersion);
         ImGui.Text("GitHub: https://github.com/ShuShuicu/VC_Saki");
     }
