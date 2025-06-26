@@ -96,7 +96,11 @@ export class SakiImgUI {
     }
 
     private renderAboutTab(): void {
-        ImGui.Text(`Saki v${this.gVersion}`);
+        ImGui.Text("Saki by Tomori");
+        ImGui.Text("GTAMOD: www.gtamodx.com");
+        ImGui.Spacing();
+        ImGui.Text("Version: " + this.gVersion);
+        ImGui.Text("GitHub: https://github.com/ShuShuicu/VC_Saki");
     }
 
     private renderFPSOverlay(gPlayerChar: Char): void {
