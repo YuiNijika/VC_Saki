@@ -1,6 +1,6 @@
 /**
  * @author 鼠子(Tomoriゞ)
- * @version 1.1.0
+ * @version 1.1.0_Dev
  * @description 基于 CLEO Redux 的简单功能脚本 for VC
  * @link https://github.com/ShuShuicu/VC_Saki
  * @license MIT
@@ -85,19 +85,29 @@ class Saki {
     }
 
     private spawnVehicle(modelId: number, message: string): void {
-        log(`开始加载车辆模型: ${modelId}`);
-        this.loadModel(modelId);
+        // 加载模型
+        Streaming.RequestModel(modelId);
+        while (!Streaming.HasModelLoaded(modelId)) {
+            wait(250);
+        }
 
-        const pos = this.getSpawnPosition();
-        log(`车辆将在位置 x:${pos.x.toFixed(2)}, y:${pos.y.toFixed(2)}, z:${pos.z.toFixed(2)} 生成`);
-
+        // 生成车辆
+        const pos = this.addVec(this.player.getChar().getCoordinates(), { x: 2.0, y: -2.0, z: 0 });
         const vehicle = Car.Create(modelId, pos.x, pos.y, pos.z);
-        const blip = Blip.AddForCar(vehicle);
-        log(`车辆已生成，ID: ${vehicle}`);
 
-        this.setupVehicle(vehicle);
+        // 设置车辆
+        vehicle.lockDoors(0).closeAllDoors();
+        const blip = Blip.AddForCar(vehicle);
+
+        // 显示结果
         this.showNotification(message);
-        this.cleanup(vehicle, modelId, blip);
+        log(`[车辆生成] ${message} (ID:${vehicle} 位置:${pos.x.toFixed(0)},${pos.y.toFixed(0)})`);
+
+        // 清理
+        wait(2000);
+        vehicle.markAsNoLongerNeeded();
+        Streaming.MarkModelAsNoLongerNeeded(modelId);
+        blip.remove();
     }
 
     private getSpawnPosition(): { x: number; y: number; z: number } {
