@@ -1,165 +1,83 @@
-/**
- * @author 鼠子(Tomoriゞ)
- * @version 1.1.0
- * @description 基于 CLEO Redux 的简单功能脚本 for VC
- * @link https://github.com/ShuShuicu/VC_Saki
- * @license MIT
- */
-
 /// <reference path="../.config/vc.d.ts" />
 import { KeyCode } from '../.config/enums';
-import { SakiImgUI } from './includes/Saki_imgui';
+import { FPSOverlay } from './src/Saki_FPSOverlay';
+import { VehiclesTab } from './src/Saki_Vehicles';
 
-class Saki {
+const baseDri = 'CLEO/Saki_imgui/';
 
-    private player: Player;
-    private isRunning: boolean;
-    private readonly overlayOffset = 10.0;
-    private gPlayerChar: Char;
-
-    private imgUI: SakiImgUI;
+class Saki_ImGui {
+    private showWindow = false;
+    private vehiclesTab = new VehiclesTab(); // 车辆Tab实例
 
     constructor() {
         log("===== Saki酱●█▀█▄Saki酱●█▀█▄Saki酱●█▀█▄ =====");
-        this.player = new Player(0);
-        this.gPlayerChar = this.player.getChar();
-        this.imgUI = new SakiImgUI(
-            true,  // showFps
-            true,  // showCoord
-            (modelId, message) => this.spawnVehicle(modelId, message)
-        );
-        this.isRunning = true;
-        this.init();
     }
 
-    private init(): void {
-        try {
-            log("开始主循环监听");
-            while (this.isRunning) {
-                wait(0);
+    private renderAnonTab() {
+        ImGui.Spacing();
+        ImGui.Text(`FPS: ${Game.GetFramerate()}`);
+    }
 
-                this.checkSaveKey();
-                this.checkToggleWindow();
-                this.renderOverlay();
+    private renderAboutTab() {
+        // 这猪鼻LoadImage会导致崩溃, 阿米诺斯
+        // ImGui.ButtonImage(
+        //     "Tommy",
+        //     ImGui.LoadImage(`${baseDri}assets/Tommy.jpg`),
+        //     480,
+        //     270
+        // );
+        ImGui.Spacing();
+        ImGui.Text("Saki Script by Tomori");
+        ImGui.Text("GTAMOD: www.gtamodx.com");
+    }
+
+
+    public main() {
+        wait(0);
+        ImGui.BeginFrame("Saki ImGui");
+
+        FPSOverlay.render();
+
+        ImGui.SetCursorVisible(this.showWindow);
+        if (this.showWindow) {
+            ImGui.SetNextWindowSize(460.0, 600.0, 2);
+            this.showWindow = ImGui.Begin("Saki Script", this.showWindow, false, false, false, false);
+
+            ImGui.BeginChild("WindowChild");
+            let tab = ImGui.Tabs("TabBar", "Anon,Vehicles,About");
+            switch (tab) {
+                case 0:
+                    this.renderAnonTab();
+                    break;
+                case 1:
+                    this.vehiclesTab.render();
+                    break;
+                case 2:
+                    this.renderAboutTab();
+                    break;
             }
-        } catch (e) {
-            log("Saki酱严重错误: ", e);
-            exit("Saki酱异常终止");
-        } finally {
-            log("Saki酱已停止运行");
+            ImGui.EndChild();
+            ImGui.End();
         }
-    }
+        ImGui.EndFrame();
 
-    private renderOverlay(): void {
-        this.imgUI.renderOverlay(this.gPlayerChar);
-    }
-
-    // 检查F12按键切换主窗口
-    private checkToggleWindow(): void {
-        if (Pad.IsKeyPressed(KeyCode.F12)) {
-            this.imgUI.toggleMainWindow();
+        // 触发Gui
+        if (Pad.IsKeyDown(KeyCode.F5)) {
+            log(`窗口显示状态切换为: ${!this.showWindow}`);
+            this.showWindow = !this.showWindow;
         }
-    }
 
-    private calcOverlayPosition(): [number, number] {
-        const displaySize = ImGui.GetDisplaySize();
-        return [
-            this.overlayOffset,
-            this.overlayOffset
-        ];
-    }
-
-    private exitScript(): void {
-        log("正在退出Saki酱...");
-        this.isRunning = false;
-        exit("Saki酱已正常退出");
-    }
-
-    private checkSaveKey(): void {
-        if (Pad.IsKeyPressed(KeyCode.F11)) {
-            log("检测到F11按键，激活保存菜单");
+        // 保存菜单
+        if (Pad.IsKeyPressed(KeyCode.F6)) {
             Game.ActivateSaveMenu();
             log("保存菜单已激活");
             wait(0);
         }
     }
-
-    private spawnVehicle(modelId: number, message: string): void {
-        log(`开始加载车辆模型: ${modelId}`);
-        this.loadModel(modelId);
-
-        const pos = this.getSpawnPosition();
-        log(`车辆将在位置 x:${pos.x.toFixed(2)}, y:${pos.y.toFixed(2)}, z:${pos.z.toFixed(2)} 生成`);
-
-        const vehicle = Car.Create(modelId, pos.x, pos.y, pos.z);
-        const blip = Blip.AddForCar(vehicle);
-        log(`车辆已生成，ID: ${vehicle}`);
-
-        this.setupVehicle(vehicle);
-        this.showNotification(message);
-        this.cleanup(vehicle, modelId, blip);
-    }
-
-    private getSpawnPosition(): { x: number; y: number; z: number } {
-        const playerPos = this.player.getChar().getCoordinates();
-        log(`玩家当前位置: x:${playerPos.x.toFixed(2)}, y:${playerPos.y.toFixed(2)}, z:${playerPos.z.toFixed(2)}`);
-        return this.addVec(playerPos, { x: 2.0, y: -2.0, z: 0 });
-    }
-
-    private setupVehicle(vehicle: Car): void {
-        vehicle.lockDoors(0);
-        vehicle.closeAllDoors();
-        log("车辆门锁已设置");
-    }
-
-    private showNotification(message: string): void {
-        showTextBox(message);
-        log(`显示通知: ${message}`);
-    }
-
-    private cleanup(vehicle: Car, modelId: number, blip: Blip): void {
-        vehicle.markAsNoLongerNeeded();
-        Streaming.MarkModelAsNoLongerNeeded(modelId);
-        log(`车辆 ${modelId} 标记为不再需要`);
-
-        wait(2000);
-        blip.remove();
-        log("车辆雷达标记已移除");
-    }
-
-    private loadModel(modelId: number): void {
-        log(`请求加载模型: ${modelId}`);
-        Streaming.RequestModel(modelId);
-
-        let attempts = 0;
-        while (!Streaming.HasModelLoaded(modelId)) {
-            attempts++;
-            log(`等待模型加载: ${modelId}... (尝试 ${attempts})`);
-            if (attempts > 20) {
-                log(`模型加载超时: ${modelId}`);
-                throw new Error(`无法加载模型: ${modelId}`);
-            }
-            wait(250);
-        }
-        log(`模型加载完成: ${modelId}`);
-    }
-
-    private addVec(v1: { x: number; y: number; z: number }, v2: { x: number; y: number; z: number }): { x: number; y: number; z: number } {
-        const result = {
-            x: v1.x + v2.x,
-            y: v1.y + v2.y,
-            z: v1.z + v2.z
-        };
-        log(`向量相加结果: x:${result.x.toFixed(2)}, y:${result.y.toFixed(2)}, z:${result.z.toFixed(2)}`);
-        return result;
-    }
 }
 
-log("===== Saki酱初始化 =====");
-try {
-    new Saki();
-    log("Saki酱已成功启动");
-} catch (e) {
-    log("Saki酱初始化失败: ", e);
-    exit("Saki酱初始化异常");
+log("===== 启动 Saki GUI =====");
+const Saki = new Saki_ImGui();
+while (true) {
+    Saki.main();
 }
