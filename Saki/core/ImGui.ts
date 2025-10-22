@@ -9,20 +9,23 @@ export class Saki_ImGui {
     private customFontEnabled = false;
     private currentTab = 0; // 当前选中的Tab
     private vehiclesTab = new TabVehicles(); // 车辆Tab实例
+    private lastKeyCheckTime = 0;
+    private keyCheckInterval = 100; // F6按键检查间隔100ms
+    private lastF6State = false; // 记录上一次F6按键状态
 
     /**
      * 加载自定义字体
      */
     private loadCustomFont(): void {
         try {
-            log("[字体] 开始加载自定义字体...");
+            log("[字体] 开始加载字体...");
             const result = ImGui.LoadCustomFont("CLEO/Saki/assets/AlibabaPuHuiTi-Black.ttf", 12.0);
 
             if (result) {
                 this.fontLoaded = true;
                 ImGui.SetCustomFontEnabled(true);
                 this.customFontEnabled = ImGui.IsCustomFontEnabled();
-                log("[字体] 自定义字体加载成功");
+                log("[字体] 字体加载成功");
             } else {
                 this.fontError = "字体加载失败";
                 log("[字体] 字体加载失败");
@@ -70,6 +73,7 @@ export class Saki_ImGui {
     }
 
     public Main() {
+        // GUI刷新使用0ms wait，保持流畅响应
         wait(0);
         ImGui.BeginFrame("Saki ImGui");
 
@@ -78,22 +82,33 @@ export class Saki_ImGui {
             this.loadCustomFont();
         }
 
-        if (Pad.IsKeyPressed(KeyCode.F6)) {
-            this.showWindow = true;
+        // 检查F6按键
+        const currentTime = new Date().getTime();
+        if (currentTime - this.lastKeyCheckTime > this.keyCheckInterval) {
+            const currentF6State = Pad.IsKeyPressed(KeyCode.F6);
+
+            // 只在按键从释放到按下时触发
+            if (currentF6State && !this.lastF6State) {
+                this.showWindow = !this.showWindow;
+                log(`[GUI] 窗口状态: ${this.showWindow ? '显示' : '隐藏'}`);
+            }
+
+            this.lastF6State = currentF6State;
+            this.lastKeyCheckTime = currentTime;
         }
 
         Saki_ImGui.FPS_Render();
         ImGui.SetCursorVisible(this.showWindow);
 
         if (this.showWindow) {
-            ImGui.SetNextWindowSize(460.0, 600.0, 2);
-            this.showWindow = ImGui.Begin("Saki ImGui", this.showWindow, false, false, false, false);
+            ImGui.SetNextWindowSize(440.0, 600.0, 2);
+            this.showWindow = ImGui.Begin("Saki ImGui", this.showWindow, true, true, false, false);
 
             ImGui.BeginChild("Saki ImGui Child");
 
             // 添加Tab栏
             this.currentTab = ImGui.Tabs("MainTabs", "主页,载具,关于");
-            
+
             switch (this.currentTab) {
                 case 0:
                     this.renderMainTab();
